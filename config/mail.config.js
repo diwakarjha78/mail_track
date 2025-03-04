@@ -16,7 +16,7 @@ const transporter = nodemailer.createTransport({
 });
 
 async function send_mail(mail_to, mail_subject, mail_body) {
-  const logo = `<img src="https://mail-track-eight.vercel.app/api/logo?email=${encodeURIComponent(mail_to)}" style="display:none;" />`;
+  const logo = `<img src="https://mail-track-eight.vercel.app/api/logo?email=${encodeURIComponent(mail_to)}" />`;
   const link = `<a href="https://mail-track-eight.vercel.app/api/logo?email=${encodeURIComponent(mail_to)} onclick="event.preventDefault(); fetch(this.href);"" target="_blank" rel="noopener noreferrer" title="Visit Example">
   Open logo
 </a>`
@@ -25,10 +25,10 @@ async function send_mail(mail_to, mail_subject, mail_body) {
     to: mail_to,
     subject: mail_subject,
     html: `
-        ${logo}
         ${mail_body}
         <br>
         ${link}
+        ${logo}
       `,
   };
   try {
