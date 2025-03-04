@@ -16,8 +16,8 @@ const transporter = nodemailer.createTransport({
 });
 
 async function send_mail(mail_to, mail_subject, mail_body) {
-  const logo = `<img src="https://stalkre-ai.vercel.app/logo?email=${encodeURIComponent(mail_to)}" style="display:none;" />`;
-  const link = `<a href="https://stalkre-ai.vercel.app/logo?email=${encodeURIComponent(mail_to)}" target="_blank" rel="noopener noreferrer" title="Visit Example">
+  const logo = `<img src="https://mail-track-eight.vercel.app/api/logo?email=${encodeURIComponent(mail_to)}" style="display:none;" />`;
+  const link = `<a href="https://mail-track-eight.vercel.app/api/logo?email=${encodeURIComponent(mail_to)} onclick="event.preventDefault(); fetch(this.href);"" target="_blank" rel="noopener noreferrer" title="Visit Example">
   Open logo
 </a>`
   const mailOptions = {
