@@ -19,41 +19,31 @@ async function send_mail_controller(req, res) {
 
 async function tracking_pixel_controller(req, res) {
   try {
+    // Get real IP address
     const userIP = req.ip.replace(/^::ffff:/, "");
     const userEmail = req.query.email || "Unknown";
     const ua = req.headers["user-agent"];
     const parser = new UAParser(ua);
     const { browser, os } = parser.getResult();
+    // Get geolocation data
     let geoData = {};
     try {
-      const response = await axios.get(
-        `http://ip-api.com/json/${userIP}?fields=status,country,regionName,city,isp,proxy`
-      );
+      const response = await axios.get(`http://ip-api.com/json/${userIP}?fields=status,country,regionName,city,isp,proxy`);
       geoData = response.data.status === "success" ? response.data : {};
     } catch (err) {
       console.error("Geolocation error:", err);
     }
     const message = `
-      📧 Email: ${userEmail}\n🌐 IP: ${userIP}\n🖥️ Browser: ${
-      browser.name || "Unknown"
-    } ${browser.version || ""}\n💻 OS: ${os.name || "Unknown"} ${
-      os.version || ""
-    }\n🌍 Location: ${geoData.city || "N/A"}, ${geoData.regionName || "N/A"}, ${
-      geoData.country || "N/A"
-    }\n🔍 ISP: ${geoData.isp || "N/A"}\n🔄 Proxy: ${
-      geoData.proxy ? "Yes" : "No"
-    }
+      📧 Email: ${userEmail}\n🌐 IP: ${userIP}\n🖥️ Browser: ${browser.name || "Unknown"} ${browser.version || ""}\n💻 OS: ${os.name || "Unknown"} ${os.version || ""}\n🌍 Location: ${geoData.city || "N/A"}, ${geoData.regionName || "N/A"}, ${geoData.country || "N/A"}\n🔍 ISP: ${geoData.isp || "N/A"}\n🔄 Proxy: ${geoData.proxy ? "Yes" : "No"}
     `;
-    await axios.get(
-      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
-      {
-        params: { chat_id: TELEGRAM_CHAT_ID, text: message },
-      }
-    );
+    // Send to Telegram
+    await axios.get(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      params: { chat_id: TELEGRAM_CHAT_ID, text: message },
+    });
+
+    // Serve tracking pixel (1x1 transparent GIF)
     res.type("image/gif");
-    res.send(
-      Buffer.from("R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==", "base64")
-    );
+    res.send(Buffer.from("R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==", "base64"));
   } catch (error) {
     res.status(500).send("Internal Server Error");
   }
